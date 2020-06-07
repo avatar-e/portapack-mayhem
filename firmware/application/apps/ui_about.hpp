@@ -52,7 +52,7 @@ public:
 	
 	void focus() override;
 	
-	std::string title() const override { return "About"; };
+	std::string title() const override { return "About2"; };
 
 private:
 	void update();
