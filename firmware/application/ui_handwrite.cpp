@@ -44,7 +44,7 @@ HandWriteView::HandWriteView(
 {
 	size_t n;
 	
-	// Handwriting alphabet definition here
+	// Handwriting alphabet definition her
 	handwriting = &handwriting_unistroke;
 
 	add_children({
