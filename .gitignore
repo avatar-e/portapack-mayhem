@@ -62,4 +62,10 @@ CMakeFiles/
 
 # Host OS leftovers
 .DS_Store
-/firmware/CMakeCache.txt
+CMakeCache.txt
+
+# VS Code
+.vscode/
+
+# Local History for Visual Studio Code
+.history/
