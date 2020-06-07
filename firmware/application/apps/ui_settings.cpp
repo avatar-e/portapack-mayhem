@@ -29,6 +29,7 @@
 #include "lpc43xx_cpp.hpp"
 using namespace lpc43xx;
 
+#include "audio.hpp"
 #include "portapack.hpp"
 using portapack::receiver_model;
 using namespace portapack;
@@ -106,9 +107,8 @@ SetDateTimeModel SetDateTimeView::form_collect() {
 	};
 }
 
-SetRadioView::SetRadioView(
-	NavigationView& nav
-) {
+SetRadioView::SetRadioView(NavigationView& nav) {
+
 	button_cancel.on_select = [&nav](Button&){
 		nav.pop();
 	};
@@ -263,14 +263,23 @@ SetUIView::SetUIView(NavigationView& nav) {
 		options_bloff.set_selected_index(0);
 	}
 
+	checkbox_speaker.on_select = [this](Checkbox&, bool v) {
+    		if (!v) audio::output::speaker_mute();		//Just mute audio if speaker is disabled
+
+			persistent_memory::set_config_speaker(v);	//Store Speaker status
+
+        StatusRefreshMessage message { };				//Refresh status bar with/out speaker
+        EventDispatcher::send_message(message);
+    };
+
 	button_ok.on_select = [&nav, this](Button&) {
 		if (checkbox_bloff.value())
 			persistent_memory::set_config_backlight_timer(options_bloff.selected_index() + 1);
 		else
 			persistent_memory::set_config_backlight_timer(0);
 		
-		persistent_memory::set_config_backbutton(checkbox_backbutton.value());
-		persistent_memory::set_config_speaker(checkbox_speaker.value());
+		persistent_memory::set_config_backbutton(checkbox_backbutton.value());	
+
 		persistent_memory::set_config_splash(checkbox_showsplash.value());
 		//persistent_memory::set_config_login(checkbox_login.value());
 		nav.pop();
@@ -484,12 +493,12 @@ SettingsMenuView::SettingsMenuView(NavigationView& nav) {
 		});
 	add_items({
 		{ "Audio", 			ui::Color::dark_cyan(), &bitmap_icon_speaker,	[&nav](){ nav.push<SetAudioView>(); } },
-		{ "Radio",			ui::Color::dark_cyan(), nullptr,	[&nav](){ nav.push<SetRadioView>(); } },
-		{ "UI", 			ui::Color::dark_cyan(), nullptr,	[&nav](){ nav.push<SetUIView>(); } },
-		//{ "SD card modules", ui::Color::dark_cyan(), [&nav](){ nav.push<ModInfoView>(); } },
-		{ "Date/Time",		ui::Color::dark_cyan(), nullptr,	[&nav](){ nav.push<SetDateTimeView>(); } },
-		{ "Touch screen",	ui::Color::dark_cyan(), nullptr,	[&nav](){ nav.push<TouchCalibrationView>(); } },
-		//{ "Play dead",		ui::Color::dark_cyan(), &bitmap_icon_playdead,	[&nav](){ nav.push<SetPlayDeadView>(); } }
+		{ "Radio",			ui::Color::dark_cyan(), &bitmap_icon_options_radio,		[&nav](){ nav.push<SetRadioView>(); } },
+		{ "Interface", 		ui::Color::dark_cyan(), &bitmap_icon_options_ui,		[&nav](){ nav.push<SetUIView>(); } },
+		//{ "SD card modules", ui::Color::dark_cyan(), 								  [&nav](){ nav.push<ModInfoView>(); } },
+		{ "Date/Time",		ui::Color::dark_cyan(), &bitmap_icon_options_datetime,	[&nav](){ nav.push<SetDateTimeView>(); } },
+		{ "Touchscreen",	ui::Color::dark_cyan(), &bitmap_icon_options_touch,		[&nav](){ nav.push<TouchCalibrationView>(); } },
+		//{ "Play dead",	   ui::Color::dark_cyan(), &bitmap_icon_playdead,		  [&nav](){ nav.push<SetPlayDeadView>(); } }
 	});
 	set_max_rows(2); // allow wider buttons
 }
