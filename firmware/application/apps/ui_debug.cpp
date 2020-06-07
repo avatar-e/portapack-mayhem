@@ -19,6 +19,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "portapack_persistent_memory.hpp"
 #include "ui_debug.hpp"
 
 #include "ch.h"
@@ -320,6 +321,9 @@ void DebugControlsView::focus() {
 /* DebugPeripheralsMenuView **********************************************/
 
 DebugPeripheralsMenuView::DebugPeripheralsMenuView(NavigationView& nav) {
+		if (portapack::persistent_memory::config_backbutton()) add_items({
+			{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
+		});
 	add_items({
 		{ "RFFC5072",    ui::Color::dark_cyan(),	&bitmap_icon_peripherals_details,	[&nav](){ nav.push<RegistersView>(
 			"RFFC5072", RegistersWidgetConfig { 31, 16 },
@@ -344,8 +348,10 @@ DebugPeripheralsMenuView::DebugPeripheralsMenuView(NavigationView& nav) {
 /* DebugMenuView *********************************************************/
 
 DebugMenuView::DebugMenuView(NavigationView& nav) {
+	if (portapack::persistent_memory::config_backbutton()) add_items({
+		{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
+		});
 	add_items({
-		//{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
 		{ "Memory", 		ui::Color::dark_cyan(),	&bitmap_icon_memory,	[&nav](){ nav.push<DebugMemoryView>(); } },
 		//{ "Radio State",	ui::Color::white(),	nullptr,	[&nav](){ nav.push<NotImplementedView>(); } },
 		{ "SD Card",		ui::Color::dark_cyan(),	&bitmap_icon_sdcard,	[&nav](){ nav.push<SDCardDebugView>(); } },

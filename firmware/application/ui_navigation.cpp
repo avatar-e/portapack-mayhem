@@ -106,6 +106,7 @@ SystemStatusView::SystemStatusView(
 		&backdrop,
 		&button_back,
 		&title,
+		&button_speaker,
 		&button_stealth,
 		//&button_textentry,
 		&button_camera,
@@ -115,6 +116,11 @@ SystemStatusView::SystemStatusView(
 		&sd_card_status_view,
 	});
 	
+	if (portapack::persistent_memory::config_speaker()) 
+		button_speaker.hidden(false);
+	else
+		button_speaker.hidden(true);
+
 	button_back.id = -1;	// Special ID used by FocusManager
 	title.set_style(&style_systemstatus);
 	
@@ -132,6 +138,10 @@ SystemStatusView::SystemStatusView(
 		if (this->on_back)
 			this->on_back();
 	};
+
+	button_speaker.on_select = [this](ImageButton&) {
+ 		this->on_speaker();
+ 	};
 	
 	button_stealth.on_select = [this](ImageButton&) {
 		this->on_stealth();
@@ -156,6 +166,13 @@ SystemStatusView::SystemStatusView(
 }
 
 void SystemStatusView::refresh() {
+	if (portapack::persistent_memory::config_speaker()) {
+		button_speaker.set_foreground(Color::light_grey());
+		button_speaker.hidden(false);
+	}		
+	else {
+		button_speaker.hidden(true);
+	}
 	if (portapack::get_antenna_bias()) {
 		button_bias_tee.set_bitmap(&bitmap_icon_biast_on);
 		button_bias_tee.set_foreground(ui::Color::yellow());
@@ -187,6 +204,21 @@ void SystemStatusView::set_title(const std::string new_value) {
 		title.set(new_value);
 	}
 }
+
+void SystemStatusView::on_speaker() {
+ 	if (!portapack::speaker_mode) 
+ 	{
+ 		portapack::set_speaker_mode(true);
+ 		button_speaker.set_foreground(Color::green());
+ 	}
+ 	else
+ 	{
+ 		portapack::set_speaker_mode(false);
+ 		button_speaker.set_foreground(Color::light_grey());
+ 	}
+
+ }
+
 
 void SystemStatusView::on_stealth() {
 	bool mode = not portapack::persistent_memory::stealth_mode();
@@ -345,8 +377,10 @@ void NavigationView::focus() {
 /* ReceiversMenuView *****************************************************/
 
 ReceiversMenuView::ReceiversMenuView(NavigationView& nav) {
+	if (portapack::persistent_memory::config_backbutton()) add_items({
+		{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
+		});
 	add_items({
-		//{ "..", 		ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
 		{ "ADS-B", 		ui::Color::green(),		&bitmap_icon_adsb,		[&nav](){ nav.push<ADSBRxView>(); }, },
 		{ "ACARS", 		ui::Color::yellow(),	&bitmap_icon_adsb,		[&nav](){ nav.push<ACARSAppView>(); }, },
 		{ "AIS Boats",	ui::Color::green(),		&bitmap_icon_ais,		[&nav](){ nav.push<AISAppView>(); } },
@@ -373,8 +407,10 @@ ReceiversMenuView::ReceiversMenuView(NavigationView& nav) {
 /* TransmittersMenuView **************************************************/
 
 TransmittersMenuView::TransmittersMenuView(NavigationView& nav) {
+	if (portapack::persistent_memory::config_backbutton()) add_items({
+		{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
+		});
 	add_items({
-		//{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
 		{ "ADS-B [S]",		ui::Color::yellow(), 	&bitmap_icon_adsb,		[&nav](){ nav.push<ADSBTxView>(); } },
 		{ "APRS", 			ui::Color::orange(),	&bitmap_icon_aprs,		[&nav](){ nav.push<APRSTXView>(); } },
 		{ "BHT Xy/EP", 		ui::Color::green(), 	&bitmap_icon_bht,		[&nav](){ nav.push<BHTView>(); } },
@@ -400,9 +436,11 @@ TransmittersMenuView::TransmittersMenuView(NavigationView& nav) {
 /* UtilitiesMenuView *****************************************************/
 
 UtilitiesMenuView::UtilitiesMenuView(NavigationView& nav) {
+	if (portapack::persistent_memory::config_backbutton()) add_items({
+		{ "..",				ui::Color::light_grey(),&bitmap_icon_previous,	[&nav](){ nav.pop(); } },
+		});
 	add_items({
 		//{ "Test app", 		ui::Color::dark_grey(),	nullptr,				[&nav](){ nav.push<TestView>(); } },
-		//{ "..", 			ui::Color::light_grey(),&bitmap_icon_previous,		[&nav](){ nav.pop(); } },
 		{ "Freq manager",	ui::Color::green(), 	&bitmap_icon_freqman,		[&nav](){ nav.push<FrequencyManagerView>(); } },
 		{ "File manager", 	ui::Color::yellow(),	&bitmap_icon_dir,			[&nav](){ nav.push<FileManagerView>(); } },
 		//{ "Notepad",		ui::Color::dark_grey(),	&bitmap_icon_notepad,		[&nav](){ nav.push<NotImplementedView>(); } },

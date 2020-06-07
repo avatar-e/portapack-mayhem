@@ -200,14 +200,27 @@ private:
 		"Login with play dead"
 	};*/
 	
-	Checkbox checkbox_bloff {
+	Checkbox checkbox_backbutton {
+		{ 3 * 8, 3 * 16 },
+		19,
+		"Back dots in menues"
+	};
+
+	Checkbox checkbox_speaker {
 		{ 3 * 8, 5 * 16 },
+		20,
+		"Speaker present (H1)"
+	};
+
+
+	Checkbox checkbox_bloff {
+		{ 3 * 8, 7 * 16 },
 		20,
 		"Backlight off after:"
 	};
 
 	OptionsField options_bloff {
-		{ 52, 6 * 16 + 8 },
+		{ 10 * 8, 9 * 16 },
 		10,
 		{
 			{ "5 seconds", 5 },
@@ -221,7 +234,7 @@ private:
 	};
 	
 	Checkbox checkbox_showsplash {
-		{ 3 * 8, 9 * 16 },
+		{ 3 * 8, 11 * 16 },
 		11,
 		"Show splash"
 	};
