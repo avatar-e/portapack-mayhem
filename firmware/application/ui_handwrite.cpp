@@ -62,7 +62,7 @@ HandWriteView::HandWriteView(
 		button.set_parent_rect({
 			static_cast<Coord>(n * 24),
 			static_cast<Coord>(236),
-			24, 28
+			24, 29
 		});
 		const std::string label {
 			(char)(n + '0')
